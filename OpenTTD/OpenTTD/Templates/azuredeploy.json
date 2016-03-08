@@ -26,6 +26,9 @@
       "network": {
         "networkInterfaces": "2015-06-15",
         "virtualNetworks": "2015-06-15"
+      },
+      "storage": {
+        "storageAccounts": "2015-06-15"
       }
     },
     "server": {
@@ -51,11 +54,21 @@
         "name": "osdisk"
       },
       "account": {
-        "name": "[uniqueString(resourceGroup().id)]"
+        "name": "[uniqueString(resourceGroup().id)]",
+        "type": "Standard_LRS"
       }
     }
   },
   "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "[variables('apiVersion').storage.storageAccounts]",
+      "location": "[parameters('location')]",
+      "name": "[variables('storage').account.name]",
+      "properties": {
+        "accountType": "[variables('storage').account.type]"
+      }
+    },
     {
       "type": "Microsoft.Network/virtualNetworks",
       "apiVersion": "[variables('apiVersion').network.virtualNetworks]",
@@ -95,7 +108,10 @@
           "osDisk": {
             "name": "[variables('storage').server.name]",
             "createOption": "FromImage",
-            "caching": "readwrite"
+            "caching": "readwrite",
+            "vhd": {
+              "uri": ""
+            }
           }
         }
       }
