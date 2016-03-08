@@ -172,7 +172,7 @@
         "type": "DSC",
         "typeHandlerVersion": "2.8",
         "settings": {
-          "ModuleUrl": "",
+          "ModuleUrl": "https://raw.githubusercontent.com/llstrk/OpenTTD-AzureARM/master/OpenTTD/OpenTTD/Scripts/OpenTTDDSC.ps1.zip",
           "ConfigurationFunction": "OpenTTDDSC.ps1\\OpenTTDServer",
           "Properties": {
             "MachineName": "[variables('server').name]"
