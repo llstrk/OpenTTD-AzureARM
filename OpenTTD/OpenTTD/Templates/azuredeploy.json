@@ -16,6 +16,13 @@
       "allowedValues": [
         "West Europe"
       ]
+    },
+    "adminUsername": {
+      "type": "string",
+      "defaultValue": "azadmin"
+    },
+    "adminPassword": {
+      "type": "securestring"
     }
   },
   "variables": {
@@ -41,17 +48,23 @@
       "subnet": {
         "name": "openttdsubnet",
         "prefix": "192.168.0.0/24"
-        "reference": "[concat(variables('network').virtualNetwork.id), '/subnets/, '[variables('network').subnet.name]']"
       },
       "virtualNetwork": {
         "name": "openttdvnet",
-        "prefix": "192.168.0.0/16",
-        "id": "[concat('Microsoft.Network/virtualNetworks', variables('network').virtualNetwork.name)]"
+        "prefix": "192.168.0.0/16"
       }
     },
+    "storageAccountName": "[uniqueString(resourceGroup().id)]",
+    "virtualNetworkName": "openttdvnet",
+    "virtualNetworkId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
+    "subnetName": "openttdsubnet",
+    "subnetReference": "[concat(variables('virtualNetworkId'), '/subnets/', variables('subnetName'))]",
     "storage": {
       "server": {
-        "name": "osdisk"
+        "name": "osdisk",
+        "vhd": {
+          "uri": "[concat('http://', variables('storageAccountName'), '.blob.core.windows.net/', 'vhds', '/', 'osdisk.vhd')]"
+        }
       },
       "account": {
         "name": "[uniqueString(resourceGroup().id)]",
@@ -92,11 +105,13 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachines",
-      "apiVersion": "[variables('apiVersion').compute.apiVersion",
+      "apiVersion": "[variables('apiVersion').compute.virtualMachines]",
       "name": "[variables('server').name]",
       "location": "[parameters('location')]",
       "properties": {
-        "hardwareProfile": "[parameters('vmSize')]",
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmSize')]"
+        },
         "networkProfile": {
           "networkInterfaces": [
             {
@@ -110,9 +125,20 @@
             "createOption": "FromImage",
             "caching": "readwrite",
             "vhd": {
-              "uri": ""
+              "uri": "[variables('storage').server.vhd.uri]"
             }
+          },
+          "imageReference": {
+            "offer": "WindowsServer",
+            "publisher": "MicrosoftWindowsServer",
+            "version": "latest",
+            "sku": "2016-Nano-Server-Technical-Preview"
           }
+        },
+        "osProfile": {
+          "computerName": "[variables('server').name]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
         }
       }
     },
@@ -128,7 +154,7 @@
             "properties": {
               "privateIPAllocationMethod": "Dynamic",
               "subnet": {
-                "id": ""
+                "id": "[variables('subnetReference')]"
               }
             }
           }
