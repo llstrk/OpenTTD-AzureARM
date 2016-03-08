@@ -28,7 +28,8 @@
   "variables": {
     "apiVersion": {
       "compute": {
-        "virtualMachines": "2015-06-15"
+        "virtualMachines": "2015-06-15",
+        "extensions": "2015-06-15"
       },
       "network": {
         "networkInterfaces": "2015-06-15",
@@ -159,6 +160,24 @@
             }
           }
         ]
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "apiVersion": "[variables('apiVersion').compute.extentions]",
+      "name": "dscExtension",
+      "location": "[parameters('location')]",
+      "properties": {
+        "publisher": "Microsoft.PowerShell",
+        "type": "DSC",
+        "typeHandlerVersion": "2.8",
+        "settings": {
+          "ModuleUrl": "",
+          "ConfigurationFunction": "OpenTTDDSC.ps1\\OpenTTDServer",
+          "Properties": {
+            "MachineName": "[variables('server').name]"
+          }
+        }
       }
     }
   ],
