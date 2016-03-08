@@ -1,0 +1,125 @@
+﻿{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmSize": {
+      "type": "string",
+      "defaultValue": "Basic_A2",
+      "allowedValues": [
+        "Basic_A1",
+        "Basic_A2"
+      ]
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "West Europe",
+      "allowedValues": [
+        "West Europe"
+      ]
+    }
+  },
+  "variables": {
+    "apiVersion": {
+      "compute": {
+        "virtualMachines": "2015-06-15"
+      },
+      "network": {
+        "networkInterfaces": "2015-06-15",
+        "virtualNetworks": "2015-06-15"
+      }
+    },
+    "server": {
+      "name": "server1"
+    },
+    "network": {
+      "server": {
+        "name": "server1nic1"
+      },
+      "subnet": {
+        "name": "openttdsubnet",
+        "prefix": "192.168.0.0/24"
+        "reference": "[concat(variables('network').virtualNetwork.id), '/subnets/, '[variables('network').subnet.name]']"
+      },
+      "virtualNetwork": {
+        "name": "openttdvnet",
+        "prefix": "192.168.0.0/16",
+        "id": "[concat('Microsoft.Network/virtualNetworks', variables('network').virtualNetwork.name)]"
+      }
+    },
+    "storage": {
+      "server": {
+        "name": "osdisk"
+      },
+      "account": {
+        "name": "[uniqueString(resourceGroup().id)]"
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "[variables('apiVersion').network.virtualNetworks]",
+      "location": "[parameters('location')]",
+      "name": "[variables('network').virtualNetwork.name]",
+      "properties": {
+        "subnets": [
+          {
+            "name": "[variables('network').subnet.name]",
+            "properties": {
+              "addressPrefix": "[variables('network').subnet.prefix]"
+            }
+          }
+        ],
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('network').virtualNetwork.prefix]"
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "[variables('apiVersion').compute.apiVersion",
+      "name": "[variables('server').name]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "hardwareProfile": "[parameters('vmSize')]",
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('network').server.name)]"
+            }
+          ]
+        },
+        "storageProfile": {
+          "osDisk": {
+            "name": "[variables('storage').server.name]",
+            "createOption": "FromImage",
+            "caching": "readwrite"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "[variables('apiVersion').network.networkInterfaces]",
+      "location": "[parameters('location')]",
+      "name": "[variables('network').server.name]",
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": ""
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+    "outputs": {
+    }
+}
