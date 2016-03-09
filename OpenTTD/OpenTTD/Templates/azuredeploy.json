@@ -14,7 +14,9 @@
       "type": "string",
       "defaultValue": "West Europe",
       "allowedValues": [
-        "West Europe"
+        "West Europe",
+        "North Europe",
+        "East US"
       ]
     },
     "adminUsername": {
@@ -139,7 +141,7 @@
             "offer": "WindowsServer",
             "publisher": "MicrosoftWindowsServer",
             "version": "latest",
-            "sku": "2016-Nano-Server-Technical-Preview"
+            "sku": "Windows-Server-Technical-Preview"
           }
         },
         "osProfile": {
