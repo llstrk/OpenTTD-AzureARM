@@ -26,13 +26,25 @@
     "adminPassword": {
       "type": "securestring"
     },
-    "moduleUrl": {
+    "configurationUrl": {
       "type": "string",
       "defaultValue": "https://raw.githubusercontent.com/llstrk/OpenTTD-AzureARM/master/OpenTTD/OpenTTD/Scripts/OpenTTDDSC.ps1.zip"
     },
+    "configurationScript": {
+      "type": "string",
+      "defaultValue": "OpenTTDDSC.ps1"
+    },
     "configurationFunction": {
       "type": "string",
-      "defaultValue": "OpenTTDDSC.ps1\\OpenTTDServer"
+      "defaultValue": "OpenTTDServer"
+    },
+    "vmSku": {
+      "type": "string",
+      "allowedValues": [
+        "2012-R2-Datacenter",
+        "Windows-Server-Technical-Preview"
+      ],
+      "defaultValue": "2012-R2-Datacenter"
     }
   },
   "variables": {
@@ -149,7 +161,7 @@
             "offer": "WindowsServer",
             "publisher": "MicrosoftWindowsServer",
             "version": "latest",
-            "sku": "Windows-Server-Technical-Preview"
+            "sku": "[parameters('vmSku')]"
           }
         },
         "osProfile": {
@@ -196,12 +208,17 @@
       "properties": {
         "publisher": "Microsoft.PowerShell",
         "type": "DSC",
-        "typeHandlerVersion": "2.8",
+        "typeHandlerVersion": "2.14",
+        "autoUpgradeMinorVersion": "true",
         "settings": {
-          "ModuleUrl": "[parameters('moduleUrl')]",
-          "ConfigurationFunction": "[parameters('configurationFunction')]",
-          "Properties": {
-            "MachineName": "[variables('server').name]"
+          "wmfVersion": "latest",
+          "configuration": {
+            "url": "[parameters('configurationUrl')]",
+            "script": "[parameters('configurationScript')]",
+            "function": "[parameters('configurationFunction')]"
+          },
+          "configurationArguments": {
+            "ComputerName": "[variables('server').name]"
           }
         }
       }
