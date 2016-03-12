@@ -21,10 +21,18 @@
     },
     "adminUsername": {
       "type": "string",
-      "defaultValue": "azadmin"
+      "defaultValue": "azmin"
     },
     "adminPassword": {
       "type": "securestring"
+    },
+    "moduleUrl": {
+      "type": "string",
+      "defaultValue": "https://raw.githubusercontent.com/llstrk/OpenTTD-AzureARM/master/OpenTTD/OpenTTD/Scripts/OpenTTDDSC.ps1.zip"
+    },
+    "configurationFunction": {
+      "type": "string",
+      "defaultValue": "OpenTTDDSC.ps1\\OpenTTDServer"
     }
   },
   "variables": {
@@ -190,8 +198,8 @@
         "type": "DSC",
         "typeHandlerVersion": "2.8",
         "settings": {
-          "ModuleUrl": "https://raw.githubusercontent.com/llstrk/OpenTTD-AzureARM/master/OpenTTD/OpenTTD/Scripts/OpenTTDDSC.ps1.zip",
-          "ConfigurationFunction": "OpenTTDDSC.ps1\\OpenTTDServer",
+          "ModuleUrl": "[parameters('moduleUrl')]",
+          "ConfigurationFunction": "[parameters('configurationFunction')]",
           "Properties": {
             "MachineName": "[variables('server').name]"
           }
